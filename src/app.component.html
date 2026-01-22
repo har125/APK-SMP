@@ -1,0 +1,966 @@
+<!-- Login Screen -->
+@if (!isLoggedIn()) {
+<div class="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans bg-cover bg-center" style="background-image: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)">
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.5s_ease-out] transform transition-all hover:scale-[1.01]">
+    <!-- Header -->
+    <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-full bg-white/5 opacity-20"></div>
+      <div class="relative z-10">
+        <div class="mx-auto bg-white/20 w-20 h-20 rounded-full flex items-center justify-center backdrop-blur-sm mb-4 shadow-lg border-2 border-white/30">
+          <lucide-icon [name]="icons.School" [size]="40" class="text-white drop-shadow-md"></lucide-icon>
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-1 tracking-wide text-shadow">SMP ASY-SYARIFIY</h1>
+        <p class="text-emerald-100 text-sm font-medium tracking-wider uppercase opacity-90">Pengelolaan Keuangan Wali Kelas</p>
+      </div>
+    </div>
+    
+    <!-- Login Form -->
+    <div class="p-8 pt-10">
+      <form (submit)="handleLogin($event)" class="space-y-6">
+        <div class="space-y-1">
+            <label class="block text-sm font-semibold text-slate-600 ml-1">Username</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <lucide-icon [name]="icons.User" [size]="18" class="text-slate-400 group-focus-within:text-emerald-500 transition-colors"></lucide-icon>
+              </div>
+              <input 
+                type="text" 
+                required 
+                [(ngModel)]="loginForm.username"
+                name="username"
+                class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-slate-50 focus:bg-white shadow-sm"
+                placeholder="Masukkan Username"
+              />
+            </div>
+        </div>
+
+        <div class="space-y-1">
+            <label class="block text-sm font-semibold text-slate-600 ml-1">Password</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <lucide-icon [name]="icons.Lock" [size]="18" class="text-slate-400 group-focus-within:text-emerald-500 transition-colors"></lucide-icon>
+              </div>
+              <input 
+                type="password" 
+                required 
+                [(ngModel)]="loginForm.password"
+                name="password"
+                class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-slate-50 focus:bg-white shadow-sm"
+                placeholder="Masukkan Password"
+              />
+            </div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-500/30 transform transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-4"
+        >
+          <lucide-icon [name]="icons.LogIn" [size]="20"></lucide-icon>
+          Masuk Dashboard
+        </button>
+      </form>
+
+      <div class="mt-8 text-center">
+        <p class="text-xs text-slate-400">&copy; 2024 SMP Asy-Syarifiy. All rights reserved.</p>
+        <p class="text-[10px] text-slate-300 mt-2">Default: admin / 123</p>
+      </div>
+    </div>
+  </div>
+</div>
+} @else {
+
+<!-- Main Dashboard -->
+<div class="flex h-screen font-sans transition-colors duration-300" 
+     [ngClass]="[appSettings().darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900', getTextSizeClass()]">
+
+  <!-- Sidebar Desktop -->
+  <aside class="hidden md:flex flex-col w-64 text-white shadow-xl z-20"
+         [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-r border-slate-700' : 'bg-slate-900'">
+    <div class="p-6 flex items-center gap-3 border-b" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-800'">
+      <div class="bg-emerald-500 p-2 rounded-lg">
+        <lucide-icon [name]="icons.School" [size]="24" class="text-white"></lucide-icon>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight">SMP ASY-SYARIFIY</h1>
+        <p class="text-xs text-slate-400">Keuangan Walikelas</p>
+      </div>
+    </div>
+    
+    <nav class="flex-1 p-4 space-y-2">
+      <button (click)="activeTab.set('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'dashboard' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.LayoutDashboard" [size]="20"></lucide-icon> <span>{{ t()('menu_dashboard') }}</span>
+      </button>
+      <button (click)="activeTab.set('students')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'students' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.Users" [size]="20"></lucide-icon> <span>{{ t()('menu_students') }}</span>
+      </button>
+      <button (click)="activeTab.set('transactions')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'transactions' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.Wallet" [size]="20"></lucide-icon> <span>{{ t()('menu_transactions') }}</span>
+      </button>
+      <button (click)="activeTab.set('reports')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'reports' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.FileText" [size]="20"></lucide-icon> <span>{{ t()('menu_reports') }}</span>
+      </button>
+      <button (click)="activeTab.set('ai')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'ai' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.Bot" [size]="20"></lucide-icon> <span>{{ t()('menu_ai') }}</span>
+      </button>
+      <button (click)="activeTab.set('settings')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all capitalize" [ngClass]="activeTab() === 'settings' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'">
+        <lucide-icon [name]="icons.Settings" [size]="20"></lucide-icon> <span>{{ t()('menu_settings') }}</span>
+      </button>
+    </nav>
+
+    <div class="p-4 border-t" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-800'">
+      <button (click)="handleLogout()" class="w-full flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-rose-400 transition-colors">
+        <lucide-icon [name]="icons.LogOut" [size]="20"></lucide-icon>
+        <span class="font-medium">{{ t()('menu_logout') }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  @if (isMobileMenuOpen()) {
+    <div class="fixed inset-0 bg-black/50 z-40 md:hidden" (click)="isMobileMenuOpen.set(false)"></div>
+  }
+  
+  <!-- Mobile Sidebar -->
+  <aside class="fixed top-0 left-0 bottom-0 w-64 bg-slate-900 text-white z-50 transform transition-transform duration-300 md:hidden"
+         [class.translate-x-0]="isMobileMenuOpen()" 
+         [class.-translate-x-full]="!isMobileMenuOpen()">
+    <div class="p-6 flex justify-between items-center border-b border-slate-800">
+      <span class="font-bold text-lg">Menu</span>
+      <button (click)="isMobileMenuOpen.set(false)"><lucide-icon [name]="icons.X" [size]="24"></lucide-icon></button>
+    </div>
+    <nav class="p-4 space-y-2">
+      <button (click)="activeTab.set('dashboard'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'dashboard' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.LayoutDashboard" [size]="20"></lucide-icon> {{ t()('menu_dashboard') }}
+      </button>
+      <button (click)="activeTab.set('students'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'students' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.Users" [size]="20"></lucide-icon> {{ t()('menu_students') }}
+      </button>
+      <button (click)="activeTab.set('transactions'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'transactions' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.Wallet" [size]="20"></lucide-icon> {{ t()('menu_transactions') }}
+      </button>
+      <button (click)="activeTab.set('reports'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'reports' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.FileText" [size]="20"></lucide-icon> {{ t()('menu_reports') }}
+      </button>
+      <button (click)="activeTab.set('ai'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'ai' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.Bot" [size]="20"></lucide-icon> {{ t()('menu_ai') }}
+      </button>
+      <button (click)="activeTab.set('settings'); isMobileMenuOpen.set(false)" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg capitalize" [ngClass]="activeTab() === 'settings' ? 'bg-emerald-600' : 'text-slate-400'">
+         <lucide-icon [name]="icons.Settings" [size]="20"></lucide-icon> {{ t()('menu_settings') }}
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Header -->
+    <header class="h-16 border-b flex items-center justify-between px-4 md:px-8 z-10 transition-colors"
+            [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'">
+      <div class="flex items-center gap-4">
+        <button (click)="isMobileMenuOpen.set(true)" class="md:hidden text-slate-500">
+          <lucide-icon [name]="icons.Menu" [size]="24"></lucide-icon>
+        </button>
+        <h2 class="text-xl font-bold capitalize md:block hidden" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+          @switch (activeTab()) {
+            @case ('dashboard') { {{ t()('header_dashboard') }} }
+            @case ('students') { {{ t()('header_students') }} }
+            @case ('transactions') { {{ t()('header_transactions') }} }
+            @case ('reports') { {{ t()('header_reports') }} }
+            @case ('ai') { {{ t()('header_ai') }} }
+            @case ('settings') { {{ t()('header_settings') }} }
+          }
+        </h2>
+      </div>
+      <button (click)="activeTab.set('settings')" class="flex items-center gap-4 hover:opacity-80 transition-opacity focus:outline-none" title="Ke Profil/Pengaturan">
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-bold" [ngClass]="appSettings().darkMode ? 'text-slate-200' : 'text-slate-800'">{{ profile().name }}</p>
+          <p class="text-xs text-slate-500">{{ profile().role }}</p>
+        </div>
+        <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold border-2 border-emerald-200">
+          {{ profile().avatarInitials }}
+        </div>
+      </button>
+    </header>
+
+    <!-- Content Body -->
+    <div class="flex-1 overflow-auto p-4 md:p-8">
+      
+      <!-- Dashboard View -->
+      @if (activeTab() === 'dashboard') {
+        <div class="space-y-6 animate-[slideInUp_0.5s_ease-out]">
+          
+          <!-- 4 Cards Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Card 1: Income -->
+            <div class="p-6 rounded-xl shadow-sm border flex items-start justify-between transition-colors duration-200"
+                 [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+               <div>
+                 <p class="text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('card_income') }}</p>
+                 <h3 class="text-xl font-bold text-emerald-500">{{ totalIncome() | currency:'IDR':'Rp ':'1.0-0' }}</h3>
+                 <div class="flex items-center mt-2 text-xs font-medium text-emerald-500">
+                   <lucide-icon [name]="icons.TrendingUp" [size]="14" class="mr-1"></lucide-icon> Total
+                 </div>
+               </div>
+               <div class="p-3 rounded-lg bg-emerald-500"><lucide-icon [name]="icons.Wallet" [size]="24" class="text-white"></lucide-icon></div>
+            </div>
+            
+            <!-- Card 2: Expense -->
+            <div class="p-6 rounded-xl shadow-sm border flex items-start justify-between transition-colors duration-200"
+                 [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+               <div>
+                 <p class="text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('card_expense') }}</p>
+                 <h3 class="text-xl font-bold text-rose-500">{{ totalExpenses() | currency:'IDR':'Rp ':'1.0-0' }}</h3>
+                 <div class="flex items-center mt-2 text-xs font-medium text-rose-500">
+                   <lucide-icon [name]="icons.TrendingDown" [size]="14" class="mr-1"></lucide-icon> Total
+                 </div>
+               </div>
+               <div class="p-3 rounded-lg bg-rose-500"><lucide-icon [name]="icons.CreditCard" [size]="24" class="text-white"></lucide-icon></div>
+            </div>
+
+            <!-- Card 3: Balance -->
+            <div class="p-6 rounded-xl shadow-sm border flex items-start justify-between transition-colors duration-200"
+                 [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+               <div>
+                 <p class="text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('card_balance') }}</p>
+                 <h3 class="text-xl font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ currentBalance() | currency:'IDR':'Rp ':'1.0-0' }}</h3>
+                 <div class="flex items-center mt-2 text-xs font-medium text-blue-500">
+                   <lucide-icon [name]="icons.School" [size]="14" class="mr-1"></lucide-icon> Kas Kelas
+                 </div>
+               </div>
+               <div class="p-3 rounded-lg bg-blue-500"><lucide-icon [name]="icons.Save" [size]="24" class="text-white"></lucide-icon></div>
+            </div>
+
+            <!-- Card 4: Paid Stats -->
+             <div class="p-6 rounded-xl shadow-sm border flex items-start justify-between transition-colors duration-200"
+                 [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+               <div>
+                 <p class="text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('card_paid') }}</p>
+                 <h3 class="text-xl font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ paidStudentsCount() }} / {{ students().length }}</h3>
+                 <div class="flex items-center mt-2 text-xs font-medium text-violet-500">
+                   <lucide-icon [name]="icons.ArrowUpRight" [size]="14" class="mr-1"></lucide-icon> {{ percentageCollected() }}% {{ t()('trend_month') }}
+                 </div>
+               </div>
+               <div class="p-3 rounded-lg bg-violet-500"><lucide-icon [name]="icons.Users" [size]="24" class="text-white"></lucide-icon></div>
+            </div>
+          </div>
+
+          <!-- Chart & Recent Transactions -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              <!-- Financial Chart -->
+              <div class="p-6 rounded-xl shadow-sm border flex flex-col" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+                 <h3 class="font-bold text-lg mb-6 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                    <lucide-icon [name]="icons.PieChart" [size]="20" class="text-blue-500"></lucide-icon> {{ t()('dist_title') }}
+                 </h3>
+                 <div class="flex-1 flex flex-col items-center justify-center gap-6">
+                    <div class="relative w-40 h-40 rounded-full shadow-inner" [style.background]="chartData().gradient">
+                       <div class="absolute inset-0 m-auto w-24 h-24 rounded-full flex items-center justify-center shadow-sm" [ngClass]="appSettings().darkMode ? 'bg-slate-800' : 'bg-white'">
+                          <div class="text-center">
+                             <span class="block text-[10px] font-medium uppercase tracking-wider" [ngClass]="appSettings().darkMode ? 'text-slate-500' : 'text-slate-400'">{{ t()('card_balance') }}</span>
+                             <span class="block text-xs font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ chartData().total | currency:'IDR':'':'1.0-0' }}</span>
+                          </div>
+                       </div>
+                    </div>
+                    <div class="w-full space-y-3">
+                      @for (item of chartData().data; track item.label) {
+                        <div class="flex items-center justify-between text-sm">
+                          <div class="flex items-center gap-2">
+                             <div class="w-3 h-3 rounded-full" [style.backgroundColor]="item.color"></div>
+                             <span [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">{{ item.label }}</span>
+                          </div>
+                          <div class="text-right">
+                              <span class="block font-bold" [ngClass]="appSettings().darkMode ? 'text-slate-200' : 'text-slate-700'">{{ item.value | currency:'IDR':'Rp ':'1.0-0' }}</span>
+                              <span class="text-xs text-slate-400">{{ item.percentage | number:'1.0-1' }}%</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                 </div>
+              </div>
+
+              <!-- Recent Table (Spans 2 cols) -->
+              <div class="lg:col-span-2 rounded-xl shadow-sm overflow-hidden flex flex-col" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+                <div class="p-6 border-b flex justify-between items-center" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-100'">
+                  <h3 class="font-bold" [ngClass]="appSettings().darkMode ? 'text-slate-100' : 'text-slate-800'">{{ t()('recent_title') }}</h3>
+                  <button (click)="activeTab.set('transactions')" class="text-sm text-blue-500 hover:text-blue-600 font-medium">{{ t()('btn_view_all') }}</button>
+                </div>
+                <div class="overflow-x-auto flex-1">
+                  <table class="w-full text-left text-sm" [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">
+                    <thead class="font-semibold uppercase text-xs" [ngClass]="appSettings().darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-700 text-slate-700'">
+                      <tr>
+                        <th class="px-6 py-4">{{ t()('th_student') }}</th>
+                        <th class="px-6 py-4">{{ t()('th_type') }}</th>
+                        <th class="px-6 py-4">{{ t()('th_date') }}</th>
+                        <th class="px-6 py-4">{{ t()('th_amount') }}</th>
+                        <th class="px-6 py-4">{{ t()('th_status') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y" [ngClass]="appSettings().darkMode ? 'divide-slate-700' : 'divide-slate-100'">
+                      @for (tx of recentTransactions(); track tx.id) {
+                        <tr class="transition-colors" [ngClass]="appSettings().darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'">
+                          <td class="px-6 py-4 font-medium" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-900'">
+                            @if(tx.category === 'expense') {
+                                <span class="text-rose-500 flex items-center gap-1"><lucide-icon [name]="icons.TrendingDown" [size]="14"></lucide-icon> Pengeluaran</span>
+                            } @else {
+                                {{ getStudentName(tx.studentId) }}
+                            }
+                          </td>
+                          <td class="px-6 py-4">{{ tx.type }}</td>
+                          <td class="px-6 py-4">{{ tx.date }}</td>
+                          <td class="px-6 py-4 font-medium" [ngClass]="tx.category === 'income' ? 'text-emerald-500' : 'text-rose-500'">
+                             {{ tx.category === 'income' ? '+' : '-' }} {{ tx.amount | currency:'IDR':'Rp ':'1.0-0' }}
+                          </td>
+                          <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium" [ngClass]="getStatusColor(tx.status)">{{ tx.status }}</span></td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- Students View -->
+      @if (activeTab() === 'students') {
+        <div class="rounded-xl shadow-sm overflow-hidden animate-[slideInUp_0.5s_ease-out]" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+           <div class="p-6 border-b flex flex-col sm:flex-row justify-between items-center gap-4" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-100'">
+             <h3 class="font-bold text-lg" [ngClass]="appSettings().darkMode ? 'text-slate-100' : 'text-slate-800'">{{ t()('header_students') }}</h3>
+             <div class="flex gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                <button (click)="openAddStudent()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm">
+                  <lucide-icon [name]="icons.UserPlus" [size]="16"></lucide-icon> {{ t()('btn_add_student') }}
+                </button>
+                <div class="relative flex-1 sm:flex-none min-w-[200px]">
+                  <input type="text" [placeholder]="t()('search_placeholder')" 
+                         [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                         class="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2"
+                         [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white focus:ring-emerald-500' : 'bg-white border-slate-200 text-slate-900 focus:ring-blue-500'">
+                  <lucide-icon [name]="icons.Search" [size]="18" class="absolute left-3 top-2.5" [ngClass]="appSettings().darkMode ? 'text-slate-500' : 'text-slate-400'"></lucide-icon>
+                </div>
+             </div>
+           </div>
+           <div class="overflow-x-auto">
+             <table class="w-full text-left text-sm" [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">
+                <thead class="font-semibold uppercase text-xs" [ngClass]="appSettings().darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-700 text-slate-200'">
+                  <tr>
+                    <th class="px-6 py-4">{{ t()('th_nis') }}</th>
+                    <th class="px-6 py-4">{{ t()('th_name') }}</th>
+                    <th class="px-6 py-4">{{ t()('th_class') }}</th>
+                    <th class="px-6 py-4">{{ t()('th_status') }}</th>
+                    <th class="px-6 py-4 text-right">{{ t()('th_action') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y" [ngClass]="appSettings().darkMode ? 'divide-slate-700' : 'divide-slate-100'">
+                  @for (student of filteredStudents(); track student.id) {
+                    <tr class="transition-colors group" [ngClass]="appSettings().darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'">
+                      <td class="px-6 py-4 font-mono opacity-70">{{ student.nis }}</td>
+                      <td class="px-6 py-4 font-medium" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-900'">{{ student.name }}</td>
+                      <td class="px-6 py-4">{{ student.class }}</td>
+                      <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium" [ngClass]="getStatusColor(student.status)">{{ student.status }}</span></td>
+                      <td class="px-6 py-4 text-right">
+                         <div class="flex gap-2 justify-end">
+                           <button type="button" (click)="openEditStudent(student)" 
+                                   class="px-3 py-1.5 rounded-md text-xs font-bold border flex items-center gap-1.5 transition-all"
+                                   [ngClass]="appSettings().darkMode ? 'border-amber-700 text-amber-500 hover:bg-amber-900/30' : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'">
+                              <lucide-icon [name]="icons.Pencil" [size]="14"></lucide-icon> {{ t()('btn_edit') }}
+                           </button>
+                           <button type="button" (click)="deleteStudent($event, student.id)" 
+                                   class="px-3 py-1.5 rounded-md text-xs font-bold border flex items-center gap-1.5 transition-all"
+                                   [ngClass]="appSettings().darkMode ? 'border-rose-700 text-rose-500 hover:bg-rose-900/30' : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'">
+                              <lucide-icon [name]="icons.Trash2" [size]="14"></lucide-icon> {{ t()('btn_delete') }}
+                           </button>
+                         </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+             </table>
+           </div>
+        </div>
+      }
+
+      <!-- Transactions View -->
+      @if (activeTab() === 'transactions') {
+        <div class="space-y-6 animate-[slideInUp_0.5s_ease-out]">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <h2 class="text-2xl font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ t()('header_transactions') }}</h2>
+            <button (click)="openAddPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-all">
+               <lucide-icon [name]="icons.Plus" [size]="20"></lucide-icon> {{ t()('btn_input') }}
+            </button>
+          </div>
+
+          <!-- Filter Tabs -->
+          <div class="flex gap-2 p-1 rounded-xl border w-fit" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'">
+             <button (click)="transactionFilter.set('all')" 
+                     class="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                     [ngClass]="transactionFilter() === 'all' ? (appSettings().darkMode ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-800 font-bold') : 'text-slate-500 hover:text-slate-700'">
+                {{ t()('filter_all') }}
+             </button>
+             <button (click)="transactionFilter.set('income')" 
+                     class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                     [ngClass]="transactionFilter() === 'income' ? 'bg-emerald-100 text-emerald-700 font-bold' : 'text-slate-500 hover:text-emerald-600'">
+                <lucide-icon [name]="icons.ArrowUpRight" [size]="16"></lucide-icon> {{ t()('filter_income') }}
+             </button>
+             <button (click)="transactionFilter.set('expense')" 
+                     class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+                     [ngClass]="transactionFilter() === 'expense' ? 'bg-rose-100 text-rose-700 font-bold' : 'text-slate-500 hover:text-rose-600'">
+                <lucide-icon [name]="icons.ArrowDownRight" [size]="16"></lucide-icon> {{ t()('filter_expense') }}
+             </button>
+          </div>
+
+          <div class="rounded-xl shadow-sm overflow-hidden" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'">
+            <div class="overflow-x-auto">
+               <table class="w-full text-left text-sm" [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">
+                 <thead class="font-semibold uppercase text-xs" [ngClass]="appSettings().darkMode ? 'bg-slate-700 text-slate-200' : 'bg-slate-700 text-slate-700'">
+                   <tr>
+                     <th class="px-6 py-4">{{ t()('th_id') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_student') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_type') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_method') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_date') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_amount') }}</th>
+                     <th class="px-6 py-4">{{ t()('th_status') }}</th>
+                     <th class="px-6 py-4 text-center">{{ t()('th_action') }}</th>
+                   </tr>
+                 </thead>
+                 <tbody class="divide-y" [ngClass]="appSettings().darkMode ? 'divide-slate-700' : 'divide-slate-100'">
+                   @for (tx of visibleTransactions(); track tx.id) {
+                     <tr class="transition-colors" [ngClass]="appSettings().darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'">
+                       <td class="px-6 py-4 font-mono opacity-60">#{{ tx.id }}</td>
+                       <td class="px-6 py-4 font-medium" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-900'">
+                            @if(tx.category === 'expense') {
+                                <span class="text-rose-500 flex items-center gap-1"><lucide-icon [name]="icons.TrendingDown" [size]="14"></lucide-icon> Pengeluaran</span>
+                            } @else {
+                                {{ getStudentName(tx.studentId) }}
+                            }
+                       </td>
+                       <td class="px-6 py-4">{{ tx.type }} @if(tx.category === 'income' && tx.type === 'SPP') { <span class="text-xs opacity-70 border px-1 rounded ml-1">{{ tx.month }} {{ tx.year }}</span> }</td>
+                       <td class="px-6 py-4 text-xs">
+                          <span class="px-2 py-1 rounded bg-slate-100 text-slate-600" [ngClass]="appSettings().darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'">
+                            {{ tx.paymentMethod || 'Tunai' }}
+                          </span>
+                       </td>
+                       <td class="px-6 py-4">{{ tx.date }}</td>
+                       <td class="px-6 py-4 font-bold" [ngClass]="tx.category === 'income' ? 'text-emerald-500' : 'text-rose-500'">
+                        {{ tx.category === 'income' ? '+' : '-' }} {{ tx.amount | currency:'IDR':'Rp ':'1.0-0' }}
+                       </td>
+                       <td class="px-6 py-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium" [ngClass]="getStatusColor(tx.status)">{{ tx.status }}</span></td>
+                       <td class="px-6 py-4 text-center">
+                          <button (click)="deleteTransaction($event, tx.id)" 
+                                  class="p-2 rounded-lg hover:bg-rose-100 text-rose-500 transition-colors"
+                                  title="Hapus Transaksi">
+                              <lucide-icon [name]="icons.Trash2" [size]="16"></lucide-icon>
+                          </button>
+                       </td>
+                     </tr>
+                   }
+                   @if (visibleTransactions().length === 0) {
+                     <tr>
+                        <td colspan="8" class="px-6 py-8 text-center opacity-50">
+                           Tidak ada data transaksi.
+                        </td>
+                     </tr>
+                   }
+                 </tbody>
+               </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Reports View -->
+      @if (activeTab() === 'reports') {
+        <div class="space-y-6 animate-[slideInUp_0.5s_ease-out]">
+          
+          <!-- Top Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Summary -->
+            <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+              <h3 class="font-bold text-lg mb-4 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                <lucide-icon [name]="icons.FileText" [size]="20" class="text-emerald-500"></lucide-icon> {{ t()('summary_title') }}
+              </h3>
+              <div class="space-y-4">
+                 <div class="flex justify-between items-center p-3 rounded-lg" [ngClass]="appSettings().darkMode ? 'bg-slate-700' : 'bg-slate-50'">
+                    <span [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('summary_total') }}</span>
+                    <span class="font-bold text-lg">{{ totalIncome() - totalExpenses() | currency:'IDR':'Rp ':'1.0-0' }}</span>
+                 </div>
+                 <div class="grid grid-cols-2 gap-4 mt-2">
+                     <div class="p-3 border rounded-lg" [ngClass]="appSettings().darkMode ? 'border-slate-600' : 'border-emerald-100 bg-emerald-50'">
+                        <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Total Masuk</p>
+                        <p class="text-emerald-600 font-bold">{{ totalIncome() | currency:'IDR':'Rp ':'1.0-0' }}</p>
+                     </div>
+                     <div class="p-3 border rounded-lg" [ngClass]="appSettings().darkMode ? 'border-slate-600' : 'border-rose-100 bg-rose-50'">
+                        <p class="text-xs text-rose-600 font-bold uppercase mb-1">Total Keluar</p>
+                        <p class="text-rose-600 font-bold">{{ totalExpenses() | currency:'IDR':'Rp ':'1.0-0' }}</p>
+                     </div>
+                 </div>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="p-6 rounded-xl shadow-sm border flex flex-col justify-center" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+               <h3 class="font-bold text-lg mb-6 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                  <lucide-icon [name]="icons.PieChart" [size]="20" class="text-blue-500"></lucide-icon> {{ t()('dist_title') }}
+               </h3>
+               <div class="flex flex-col sm:flex-row items-center justify-center gap-8">
+                  <div class="relative w-48 h-48 rounded-full shadow-inner" [style.background]="chartData().gradient">
+                     <div class="absolute inset-0 m-auto w-32 h-32 rounded-full flex items-center justify-center shadow-sm" [ngClass]="appSettings().darkMode ? 'bg-slate-800' : 'bg-white'">
+                        <div class="text-center">
+                           <span class="block text-xs font-medium uppercase tracking-wider" [ngClass]="appSettings().darkMode ? 'text-slate-500' : 'text-slate-400'">{{ t()('chart_total') }}</span>
+                           <span class="block text-sm font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ transactions().length }} Tx</span>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="flex-1 w-full sm:w-auto space-y-3">
+                    @for (item of chartData().data; track item.label) {
+                      <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center gap-2">
+                           <div class="w-3 h-3 rounded-full" [style.backgroundColor]="item.color"></div>
+                           <span [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">{{ item.label }}</span>
+                        </div>
+                        <span class="font-bold" [ngClass]="appSettings().darkMode ? 'text-slate-200' : 'text-slate-700'">{{ item.value | currency:'IDR':'Rp ':'1.0-0' }}</span>
+                      </div>
+                    }
+                  </div>
+               </div>
+            </div>
+          </div>
+
+          <!-- Detailed Breakdown Section -->
+          <div class="rounded-xl shadow-sm border overflow-hidden" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+             <div class="p-6 border-b" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-100'">
+                <h3 class="font-bold text-lg flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                   <lucide-icon [name]="icons.Filter" [size]="20" class="text-purple-500"></lucide-icon> {{ t()('breakdown_title') }}
+                </h3>
+             </div>
+             <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x" [ngClass]="appSettings().darkMode ? 'divide-slate-700' : 'divide-slate-100'">
+                
+                <!-- Income Breakdown -->
+                <div class="p-6">
+                   <h4 class="text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2 text-emerald-600">
+                      <lucide-icon [name]="icons.ArrowUpRight" [size]="16"></lucide-icon> {{ t()('breakdown_income') }}
+                   </h4>
+                   <div class="space-y-3">
+                      @for (item of detailedReport().income; track item.name) {
+                         <div class="flex justify-between items-center text-sm border-b border-dashed pb-2 last:border-0" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-200'">
+                            <span [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">{{ item.name }}</span>
+                            <span class="font-mono font-medium" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ item.total | currency:'IDR':'Rp ':'1.0-0' }}</span>
+                         </div>
+                      }
+                      @if (detailedReport().income.length === 0) { <p class="text-sm italic opacity-50">Belum ada data.</p> }
+                   </div>
+                </div>
+
+                <!-- Expense Breakdown -->
+                <div class="p-6">
+                   <h4 class="text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2 text-rose-600">
+                      <lucide-icon [name]="icons.ArrowDownRight" [size]="16"></lucide-icon> {{ t()('breakdown_expense') }}
+                   </h4>
+                   <div class="space-y-3">
+                      @for (item of detailedReport().expense; track item.name) {
+                         <div class="flex justify-between items-center text-sm border-b border-dashed pb-2 last:border-0" [ngClass]="appSettings().darkMode ? 'border-slate-700' : 'border-slate-200'">
+                            <span [ngClass]="appSettings().darkMode ? 'text-slate-300' : 'text-slate-600'">{{ item.name }}</span>
+                            <span class="font-mono font-medium" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ item.total | currency:'IDR':'Rp ':'1.0-0' }}</span>
+                         </div>
+                      }
+                      @if (detailedReport().expense.length === 0) { <p class="text-sm italic opacity-50">Belum ada data.</p> }
+                   </div>
+                </div>
+
+             </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- AI View -->
+      @if (activeTab() === 'ai') {
+        <div class="space-y-6 animate-[slideInUp_0.5s_ease-out]">
+          
+          <!-- Financial Analysis -->
+          <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-lg flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                <lucide-icon [name]="icons.Sparkles" [size]="20" class="text-violet-500"></lucide-icon> {{ t()('ai_tab_analysis') }}
+              </h3>
+              <button 
+                (click)="generateAIAnalysis()" 
+                [disabled]="isAnalyzing()"
+                class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition-all disabled:opacity-50"
+              >
+                @if(isAnalyzing()) { <lucide-icon [name]="icons.Loader" [size]="18" class="animate-spin"></lucide-icon> } @else { <lucide-icon [name]="icons.Bot" [size]="18"></lucide-icon> }
+                {{ isAnalyzing() ? t()('ai_analyzing') : t()('btn_analyze') }}
+              </button>
+            </div>
+            
+            <div class="p-4 rounded-lg min-h-[150px] border" [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-100'">
+              @if(analysisResult()) {
+                <div class="prose max-w-none text-sm whitespace-pre-wrap" [ngClass]="appSettings().darkMode ? 'prose-invert' : ''">
+                  {{ analysisResult() }}
+                </div>
+              } @else {
+                <div class="flex flex-col items-center justify-center h-full text-slate-400 py-8">
+                  <lucide-icon [name]="icons.Bot" [size]="48" class="mb-2 opacity-20"></lucide-icon>
+                  <p class="text-sm">Klik tombol di atas untuk memulai analisis AI.</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Message Generator -->
+          <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+             <h3 class="font-bold text-lg mb-6 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+                <lucide-icon [name]="icons.MessageCircle" [size]="20" class="text-emerald-500"></lucide-icon> {{ t()('ai_tab_message') }}
+             </h3>
+             
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                   <div>
+                      <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('ai_msg_student_label') }}</label>
+                      <select class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-emerald-500 outline-none"
+                              [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-600 text-white' : 'bg-white border-slate-200'"
+                              [(ngModel)]="msgConfigState.studentId">
+                         <option value="">{{ t()('label_select_student') }}</option>
+                         @for(s of students(); track s.id) { <option [value]="s.id">{{ s.name }}</option> }
+                      </select>
+                   </div>
+                   <div>
+                      <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('ai_msg_type_label') }}</label>
+                      <input type="text" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-emerald-500 outline-none"
+                              [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-600 text-white' : 'bg-white border-slate-200'"
+                              [(ngModel)]="msgConfigState.type">
+                   </div>
+                   <div>
+                      <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('ai_msg_amount_label') }}</label>
+                      <input type="number" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-emerald-500 outline-none"
+                              [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-600 text-white' : 'bg-white border-slate-200'"
+                              [(ngModel)]="msgConfigState.amount">
+                   </div>
+                   <button (click)="generateWAMessage()" [disabled]="!msgConfigState.studentId || isGeneratingMsg()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      @if(isGeneratingMsg()) { <lucide-icon [name]="icons.Loader" [size]="18" class="animate-spin"></lucide-icon> } @else { <lucide-icon [name]="icons.Sparkles" [size]="18"></lucide-icon> }
+                      {{ isGeneratingMsg() ? t()('ai_generating') : t()('btn_generate_msg') }}
+                   </button>
+                </div>
+
+                <div class="flex flex-col h-full">
+                   <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('ai_msg_result') }}</label>
+                   <div class="flex-1 p-4 rounded-lg border text-sm leading-relaxed whitespace-pre-wrap" 
+                        [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'">
+                      {{ generatedMessage() || 'Pesan yang dibuat akan muncul di sini...' }}
+                   </div>
+                   @if(generatedMessage()) {
+                     <div class="mt-3 flex gap-3">
+                         <button (click)="copyToClipboard()" class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium border transition-all"
+                                 [ngClass]="appSettings().darkMode ? 'border-slate-600 hover:bg-slate-800 text-slate-300' : 'border-slate-200 hover:bg-white text-slate-600'">
+                            <lucide-icon [name]="icons.Copy" [size]="16"></lucide-icon> {{ t()('btn_copy') }}
+                         </button>
+                         <button (click)="sendToWhatsApp()" class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium text-white transition-all shadow-md bg-emerald-500 hover:bg-emerald-600">
+                            <lucide-icon [name]="icons.MessageCircle" [size]="16"></lucide-icon> {{ t()('btn_send_wa') }}
+                         </button>
+                     </div>
+                   }
+                </div>
+             </div>
+          </div>
+        </div>
+      }
+
+      <!-- Settings View -->
+      @if (activeTab() === 'settings') {
+        <div class="max-w-4xl mx-auto space-y-8 pb-10 animate-[slideInUp_0.5s_ease-out]">
+          <h2 class="text-2xl font-bold" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ t()('header_settings') }}</h2>
+
+           <!-- Google Drive / Local Database Backup -->
+           <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+              <h3 class="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-2" [ngClass]="appSettings().darkMode ? 'text-white border-slate-700' : 'text-slate-800 border-slate-100'">
+                 <lucide-icon [name]="icons.HardDrive" [size]="20" class="text-blue-500"></lucide-icon>
+                 Database Cloud / File
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Backup -->
+                <div class="p-4 rounded-lg border" [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'">
+                   <h4 class="font-bold mb-2 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-slate-200' : 'text-slate-700'">
+                     <lucide-icon [name]="icons.Download" [size]="18"></lucide-icon> Backup Database
+                   </h4>
+                   <p class="text-xs mb-4" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('db_backup_info') }}</p>
+                   <button (click)="backupDatabase()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      {{ t()('btn_export') }}
+                   </button>
+                </div>
+                <!-- Restore -->
+                <div class="p-4 rounded-lg border" [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'">
+                   <h4 class="font-bold mb-2 flex items-center gap-2" [ngClass]="appSettings().darkMode ? 'text-slate-200' : 'text-slate-700'">
+                     <lucide-icon [name]="icons.Upload" [size]="18"></lucide-icon> Restore Database
+                   </h4>
+                   <p class="text-xs mb-4" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('db_restore_info') }}</p>
+                   <input #fileInput type="file" accept=".json" class="hidden" (change)="restoreDatabase($event)">
+                   <button (click)="triggerRestore()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      {{ t()('btn_import') }}
+                   </button>
+                </div>
+              </div>
+           </div>
+           
+           <!-- Account Security Settings -->
+           <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+              <h3 class="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-2" [ngClass]="appSettings().darkMode ? 'text-white border-slate-700' : 'text-slate-800 border-slate-100'">
+                <lucide-icon [name]="icons.Lock" [size]="20" class="text-rose-500"></lucide-icon>
+                {{ t()('sect_security') }}
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div>
+                    <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_username') }}</label>
+                    <input type="text" [(ngModel)]="securityFormState.username" 
+                           class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                           [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+                 </div>
+                 <div>
+                    <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_old_pass') }}</label>
+                    <input type="password" [(ngModel)]="securityFormState.currentPassword" 
+                           class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                           [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+                 </div>
+                 <div>
+                    <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_new_pass') }}</label>
+                    <input type="password" [(ngModel)]="securityFormState.newPassword" 
+                           class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                           [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+                 </div>
+                 <div>
+                    <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_confirm_pass') }}</label>
+                    <input type="password" [(ngModel)]="securityFormState.confirmPassword" 
+                           class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                           [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+                 </div>
+              </div>
+              <div class="flex justify-end pt-4">
+                 <button (click)="saveSecurityCredentials()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-medium transition-all">
+                    <lucide-icon [name]="icons.Save" [size]="18"></lucide-icon> {{ t()('btn_update_pass') }}
+                 </button>
+              </div>
+           </div>
+
+          <!-- Profile Settings -->
+          <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-2" [ngClass]="appSettings().darkMode ? 'text-white border-slate-700' : 'text-slate-800 border-slate-100'">
+              <lucide-icon [name]="icons.User" [size]="20" class="text-emerald-500"></lucide-icon>
+              {{ t()('sect_profile') }}
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div>
+                  <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_name') }}</label>
+                  <input type="text" [(ngModel)]="profileFormState.name" 
+                         class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                         [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+               </div>
+               <div>
+                  <label class="block text-sm font-medium mb-1" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_role') }}</label>
+                  <input type="text" [(ngModel)]="profileFormState.role" 
+                         class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500"
+                         [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200'">
+               </div>
+            </div>
+            <div class="flex justify-end pt-4">
+               <button (click)="saveProfile()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-medium transition-all">
+                  <lucide-icon [name]="icons.Save" [size]="18"></lucide-icon> {{ t()('btn_save_profile') }}
+               </button>
+            </div>
+          </div>
+
+          <!-- Display Settings -->
+          <div class="p-6 rounded-xl shadow-sm border" [ngClass]="appSettings().darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'">
+             <h3 class="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-2" [ngClass]="appSettings().darkMode ? 'text-white border-slate-700' : 'text-slate-800 border-slate-100'">
+               <lucide-icon [name]="icons.Monitor" [size]="20" class="text-emerald-500"></lucide-icon>
+               {{ t()('sect_display') }}
+             </h3>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Theme -->
+                <div>
+                   <label class="block text-sm font-medium mb-3" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_theme') }}</label>
+                   <div class="flex p-1 rounded-xl border" [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-100 border-slate-200'">
+                      <button (click)="setTheme(false)" 
+                              class="flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all"
+                              [ngClass]="!appSettings().darkMode ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-300'">
+                         <lucide-icon [name]="icons.Sun" [size]="18"></lucide-icon> {{ t()('theme_light') }}
+                      </button>
+                      <button (click)="setTheme(true)" 
+                              class="flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-medium transition-all"
+                              [ngClass]="appSettings().darkMode ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+                         <lucide-icon [name]="icons.Moon" [size]="18"></lucide-icon> {{ t()('theme_dark') }}
+                      </button>
+                   </div>
+                </div>
+                <!-- Language -->
+                <div>
+                   <label class="block text-sm font-medium mb-3" [ngClass]="appSettings().darkMode ? 'text-slate-400' : 'text-slate-500'">{{ t()('label_lang') }}</label>
+                   <div class="flex gap-4">
+                      <button (click)="setLanguage('id')" 
+                              class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
+                              [ngClass]="appSettings().language === 'id' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'">
+                         <span>🇮🇩</span> Indonesia
+                      </button>
+                      <button (click)="setLanguage('en')" 
+                              class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
+                              [ngClass]="appSettings().language === 'en' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-500'">
+                         <span>🇬🇧</span> English
+                      </button>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      }
+
+    </div>
+  </main>
+
+  <!-- Payment/Transaction Modal -->
+  @if (showPaymentModal()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-[zoomIn_0.2s_ease-out]" 
+            [ngClass]="appSettings().darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'">
+          <div class="px-6 py-4 border-b flex justify-between items-center" [ngClass]="appSettings().darkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-100'">
+             <h3 class="font-bold text-lg" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">{{ t()('modal_add_payment') }}</h3>
+             <button (click)="showPaymentModal.set(false)" class="text-slate-400 hover:text-slate-500"><lucide-icon [name]="icons.X" [size]="20"></lucide-icon></button>
+          </div>
+          <div class="p-6 space-y-4">
+             
+             <!-- Transaction Category Switch -->
+             <div class="flex p-1 rounded-lg border mb-4" [ngClass]="appSettings().darkMode ? 'bg-slate-900 border-slate-600' : 'bg-slate-100 border-slate-200'">
+                <button (click)="transactionFormState.category = 'income'"
+                        class="flex-1 py-2 px-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-2"
+                        [ngClass]="transactionFormState.category === 'income' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500'">
+                    <lucide-icon [name]="icons.ArrowUpRight" [size]="16"></lucide-icon> {{ t()('cat_income') }}
+                </button>
+                <button (click)="transactionFormState.category = 'expense'"
+                        class="flex-1 py-2 px-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-2"
+                        [ngClass]="transactionFormState.category === 'expense' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500'">
+                    <lucide-icon [name]="icons.ArrowDownRight" [size]="16"></lucide-icon> {{ t()('cat_expense') }}
+                </button>
+             </div>
+
+             <!-- Form Fields -->
+             <div class="space-y-4">
+                <!-- Date Field (Common) -->
+                <div>
+                   <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_date') }}</label>
+                   <input type="date" [(ngModel)]="transactionFormState.date" 
+                          class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                          [class.border-red-500]="validationErrors()['date']">
+                   @if (validationErrors()['date']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['date'] }}</p> }
+                </div>
+
+                @if (transactionFormState.category === 'income') {
+                    <!-- Income Specific Fields -->
+                    <div>
+                       <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('label_select_student') }}</label>
+                       <select [(ngModel)]="transactionFormState.studentId" 
+                               class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                               [class.border-red-500]="validationErrors()['studentId']">
+                          <option value="">{{ t()('label_select_student') }}</option>
+                          @for (s of students(); track s.id) { <option [value]="s.id">{{ s.name }} ({{ s.nis }})</option> }
+                       </select>
+                       @if (validationErrors()['studentId']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['studentId'] }}</p> }
+                    </div>
+                    <div>
+                       <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_type') }}</label>
+                       <select [(ngModel)]="transactionFormState.type" class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500">
+                          <option value="SPP">SPP</option>
+                          <option value="Uang Gedung">Uang Gedung</option>
+                          <option value="LKS">LKS</option>
+                          <option value="Seragam">Seragam</option>
+                       </select>
+                    </div>
+                } @else {
+                    <!-- Expense Specific Fields -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('label_expense_desc') }}</label>
+                        <input type="text" [(ngModel)]="transactionFormState.expenseDescription" 
+                               class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                               placeholder="Contoh: Beli Spidol, Foto Copy"
+                               [class.border-red-500]="validationErrors()['expenseDescription']">
+                        @if (validationErrors()['expenseDescription']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['expenseDescription'] }}</p> }
+                    </div>
+                }
+
+                <!-- Payment Method (Common) -->
+                <div>
+                   <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('label_payment_method') }}</label>
+                   <select [(ngModel)]="transactionFormState.paymentMethod" class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500">
+                      <option value="Tunai">Tunai</option>
+                      <option value="Transfer Bank">Transfer Bank</option>
+                      <option value="DANA : 083852040823">DANA/GOPAY/OVO</option>
+                   </select>
+                </div>
+
+                <!-- Amount Field (Common) -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_amount') }}</label>
+                    <input type="number" [(ngModel)]="transactionFormState.amount" placeholder="0" 
+                           class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                           [class.border-red-500]="validationErrors()['amount']">
+                    @if (validationErrors()['amount']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['amount'] }}</p> }
+                </div>
+             </div>
+
+             <button (click)="saveTransaction()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/10 transition-all">{{ t()('btn_save_payment') }}</button>
+          </div>
+       </div>
+    </div>
+  }
+
+  <!-- Student Modal -->
+  @if (showStudentModal()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+       <div class="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-[zoomIn_0.2s_ease-out]" 
+            [ngClass]="appSettings().darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'">
+          <div class="px-6 py-4 border-b flex justify-between items-center" [ngClass]="appSettings().darkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-100'">
+             <h3 class="font-bold text-lg" [ngClass]="appSettings().darkMode ? 'text-white' : 'text-slate-800'">
+               {{ isEditingStudent() ? t()('modal_edit_student') : t()('modal_add_student') }}
+             </h3>
+             <button (click)="showStudentModal.set(false)" class="text-slate-400 hover:text-slate-500"><lucide-icon [name]="icons.X" [size]="20"></lucide-icon></button>
+          </div>
+          <div class="p-6 space-y-4">
+             <div>
+                <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_nis') }}</label>
+                <input type="text" [(ngModel)]="studentFormState.nis" 
+                       class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                       [class.border-red-500]="validationErrors()['nis']"
+                       [class.focus:ring-red-500]="validationErrors()['nis']">
+                @if (validationErrors()['nis']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['nis'] }}</p> }
+             </div>
+             <div>
+                <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_name') }}</label>
+                <input type="text" [(ngModel)]="studentFormState.name" 
+                       class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                       [class.border-red-500]="validationErrors()['name']"
+                       [class.focus:ring-red-500]="validationErrors()['name']">
+                @if (validationErrors()['name']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['name'] }}</p> }
+             </div>
+             <div class="grid grid-cols-2 gap-4">
+                <div>
+                   <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_class') }}</label>
+                   <input type="text" [(ngModel)]="studentFormState.class" 
+                          class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                          [class.border-red-500]="validationErrors()['class']"
+                          [class.focus:ring-red-500]="validationErrors()['class']">
+                   @if (validationErrors()['class']) { <p class="text-red-500 text-xs mt-1">{{ validationErrors()['class'] }}</p> }
+                </div>
+                <div>
+                   <label class="block text-sm font-medium mb-1 text-slate-500">{{ t()('th_status') }}</label>
+                   <select [(ngModel)]="studentFormState.status" class="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 focus:ring-emerald-500">
+                      <option value="Aktif">Aktif</option>
+                      <option value="Non-Aktif">Non-Aktif</option>
+                   </select>
+                </div>
+             </div>
+             <button (click)="saveStudent()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/10 transition-all">
+                {{ isEditingStudent() ? t()('btn_save_changes') : t()('btn_add_student_submit') }}
+             </button>
+          </div>
+       </div>
+    </div>
+  }
+
+</div>
+}
